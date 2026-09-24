@@ -1,20 +1,20 @@
 import pygame
 
-width = 1920
-height = 1080
-
-board_size = min(width, height)
-square_size = board_size // 8
-
-offset_x = (width - board_size) // 2
-offset_y = (height - board_size) // 2
-
 white = (240, 217, 181)
 brown = (181, 136, 99)
 
 files = "abcdefgh"
 
+
 def draw_board(screen):
+
+    width, height = screen.get_size()
+
+    board_size = min(width, height)
+    square_size = board_size // 8
+
+    offset_x = (width - board_size) // 2
+    offset_y = (height - board_size) // 2
 
     for i in range(8):
         for j in range(8):
@@ -33,9 +33,18 @@ def draw_board(screen):
                 (x, y, square_size, square_size)
             )
 
+
 def draw_coordinates(screen):
 
     font = pygame.font.Font(None, 30)
+
+    width, height = screen.get_size()
+
+    board_size = min(width, height)
+    square_size = board_size // 8
+
+    offset_x = (width - board_size) // 2
+    offset_y = (height - board_size) // 2
 
     for col in range(8):
 
@@ -56,7 +65,15 @@ def draw_coordinates(screen):
         screen.blit(text, (x, y))
 
 
-def get_square(mouse_x, mouse_y):
+def get_square(screen, mouse_x, mouse_y):
+
+    width, height = screen.get_size()
+
+    board_size = min(width, height)
+    square_size = board_size // 8
+
+    offset_x = (width - board_size) // 2
+    offset_y = (height - board_size) // 2
 
     if (offset_x <= mouse_x < offset_x + board_size and
         offset_y <= mouse_y < offset_y + board_size):

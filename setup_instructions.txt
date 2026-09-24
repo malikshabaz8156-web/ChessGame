@@ -1,0 +1,4 @@
+step 1: Create a Python environment. Run `python -m venv venv`.
+step 2: Activate the virtual env by running `.\venv\Scripts\activate`.
+step 3: Install the 'pygame' library by executing the command - `pip install -r requirements.txt`.
+step 4: Finally, run the 'main.py' by `python main.py`.

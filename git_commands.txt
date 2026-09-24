@@ -4,3 +4,6 @@ step 2: After making changes run the commands in order:
     - git commit -m "<commit_msg>".
     - git push (For pushing the changes to the remote repo from the local repo)
     - git switch <branch_name> (For switching the 'branch')
+
+- For creating a new branch: `git checkout -b <branch_name>`.
+- For switching the branch before pushing: `git switch <branch_name>`.

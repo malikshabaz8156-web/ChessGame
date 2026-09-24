@@ -1,0 +1,6 @@
+step 1: To access the remote changes, we exec the command - `git pull`.
+step 2: After making changes run the commands in order:
+    - git add . (To add all the files in the folder).
+    - git commit -m "<commit_msg>".
+    - git push (For pushing the changes to the remote repo from the local repo)
+    - git switch <branch_name> (For switching the 'branch')

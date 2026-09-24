@@ -36,7 +36,7 @@ def draw_board(screen):
 
 def draw_coordinates(screen):
 
-    font = pygame.font.Font(None, 30)
+    font = pygame.font.SysFont("Arial", 20)
 
     width, height = screen.get_size()
 
@@ -48,16 +48,16 @@ def draw_coordinates(screen):
 
     for col in range(8):
 
-        text = font.render(files[col], True, (0, 0, 0))
+        text = font.render(files[col], True, (70, 70, 70))
 
         x = offset_x + col * square_size + 5
-        y = offset_y + board_size - 30
+        y = offset_y + board_size - 25
 
         screen.blit(text, (x, y))
 
     for row in range(8):
 
-        text = font.render(str(8 - row), True, (0, 0, 0))
+        text = font.render(str(8 - row), True, (70, 70, 70))
 
         x = offset_x + 5
         y = offset_y + row * square_size + 5

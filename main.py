@@ -6,6 +6,8 @@ pygame.init()
 screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
 pygame.display.set_caption("Chess")
+icon = pygame.image.load("assets/logo.jpg")
+pygame.display.set_icon(icon)
 
 running = True
 

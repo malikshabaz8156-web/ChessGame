@@ -1,43 +1,40 @@
 import pygame
 # import board
 
-pygame.init() # initializes Pygame's modules.
+pygame.init()
 
-# TODO: store width, height values in a constant. 
-screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE) # will create a display surface.
+screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
-pygame.display.set_caption("Chess") # title for the window.
-icon = pygame.image.load("assets/logo.jpg") # loads the 'image/icon'.
-# TODO: look up if this method can be replaced.
-pygame.display.set_icon(icon) # sets the 'image/icon'.
+pygame.display.set_caption("Chess")
 
+# Control the game loop
 running = True
 
 while running: # game loop; for rendering graphics, repeatedly handle events and update game logic.
 
-    board.draw_board(screen) # draws the 'board'.
-    board.draw_coordinates(screen) # draws the coordinates on the board.
+    board.draw_board(screen)
+    board.draw_coordinates(screen)
 
-    for event in pygame.event.get(): # iterates through the list of 'events' that occur.
+    for event in pygame.event.get():
 
-        if event.type == pygame.QUIT: # pretty straightforward.
+        if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN: # triggered when pressed a keyboard key.
-            if event.key == pygame.K_ESCAPE: # 'esc' button.
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
                 running = False
 
-        if event.type == pygame.MOUSEBUTTONDOWN: # pretty straighforward; mouse click.
+        if event.type == pygame.MOUSEBUTTONDOWN:
 
-            square = board.get_square( # gets the pos of the square that is being clicked.
+            square = board.get_square(
                 screen,
                 event.pos[0],
                 event.pos[1]
             )
 
-            if square: # if the click happens inside a particular cell/square it's displayed.
+            if square:
                 print(square)
 
-    pygame.display.update() # refresh/update the page so that changes are visible.
+    pygame.display.update()
 
-pygame.quit() # shutting down; releasing resources per se.
+pygame.quit()

@@ -1,5 +1,3 @@
-# movement.py
-
 BOARD_SIZE = 8
 
 
@@ -8,94 +6,256 @@ def is_inside_board(row, col):
     return 0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE
 
 
+def is_white(piece):
+    """Check whether a piece is white."""
+    return piece is not None and piece.startswith("W")
+
+
+def is_black(piece):
+    """Check whether a piece is black."""
+    return piece is not None and piece.startswith("B")
+
+
+def is_enemy(piece, target):
+    """Check whether target is an opponent's piece."""
+    if piece is None or target is None:
+        return False
+
+    return is_white(piece) != is_white(target)
+
+
 def get_pawn_moves(board, row, col):
-    """
-    Return all valid movement squares for a pawn.
+    """Return all valid movement squares for a pawn."""
 
-    White pawn moves upward (-1).
-    Black pawn moves downward (+1).
-
-    Board pieces:
-        WP = White Pawn
-        BP = Black Pawn
-        None = Empty square
-    """
-
-    piece = board[row][col]
     moves = []
+    piece = board[row][col]
 
-    if piece not in ("WP", "BP"):
+    if piece is None:
         return moves
 
-    direction = -1 if piece == "WP" else 1
-    start_row = 6 if piece == "WP" else 1
+    if piece == "WP":
+        direction = -1
+        start_row = 6
+    else:
+        direction = 1
+        start_row = 1
 
     new_row = row + direction
 
     if is_inside_board(new_row, col):
-
         if board[new_row][col] is None:
-
             moves.append((new_row, col))
 
             if row == start_row:
+                two_row = row + (2 * direction)
 
-                new_row_2 = row + (2 * direction)
+                if board[two_row][col] is None:
+                    moves.append((two_row, col))
 
-                if (
-                    is_inside_board(new_row_2, col)
-                    and board[new_row_2][col] is None
-                ):
-                    moves.append((new_row_2, col))
-
-    for new_col in (col - 1, col + 1):
-
-        new_row = row + direction
+    for dc in (-1, 1):
+        new_col = col + dc
 
         if is_inside_board(new_row, new_col):
-
             target = board[new_row][new_col]
 
-            if target is not None:
-
-                if piece == "WP" and target.startswith("B"):
-                    moves.append((new_row, new_col))
-
-                elif piece == "BP" and target.startswith("W"):
-                    moves.append((new_row, new_col))
+            if target is not None and is_enemy(piece, target):
+                moves.append((new_row, new_col))
 
     return moves
 
 
 def get_rook_moves(board, row, col):
-    """Return valid movement squares for a rook."""
-    return []
+    """Return all valid movement squares for a rook."""
+
+    moves = []
+    piece = board[row][col]
+
+    if piece is None:
+        return moves
+
+    directions = [
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1)
+    ]
+
+    for dr, dc in directions:
+        new_row = row + dr
+        new_col = col + dc
+
+        while is_inside_board(new_row, new_col):
+            target = board[new_row][new_col]
+
+            if target is None:
+                moves.append((new_row, new_col))
+            else:
+                if is_enemy(piece, target):
+                    moves.append((new_row, new_col))
+                break
+
+            new_row += dr
+            new_col += dc
+
+    return moves
 
 
 def get_knight_moves(board, row, col):
-    """Return valid movement squares for a knight."""
-    return []
+    """Return all valid movement squares for a knight."""
+
+    moves = []
+    piece = board[row][col]
+
+    if piece is None:
+        return moves
+
+    knight_moves = [
+        (-2, -1),
+        (-2, 1),
+        (-1, -2),
+        (-1, 2),
+        (1, -2),
+        (1, 2),
+        (2, -1),
+        (2, 1)
+    ]
+
+    for dr, dc in knight_moves:
+        new_row = row + dr
+        new_col = col + dc
+
+        if is_inside_board(new_row, new_col):
+            target = board[new_row][new_col]
+
+            if target is None:
+                moves.append((new_row, new_col))
+            elif is_enemy(piece, target):
+                moves.append((new_row, new_col))
+
+    return moves
 
 
 def get_bishop_moves(board, row, col):
-    """Return valid movement squares for a bishop."""
-    return []
+    """Return all valid movement squares for a bishop."""
+
+    moves = []
+    piece = board[row][col]
+
+    if piece is None:
+        return moves
+
+    directions = [
+        (-1, -1),
+        (-1, 1),
+        (1, -1),
+        (1, 1)
+    ]
+
+    for dr, dc in directions:
+        new_row = row + dr
+        new_col = col + dc
+
+        while is_inside_board(new_row, new_col):
+            target = board[new_row][new_col]
+
+            if target is None:
+                moves.append((new_row, new_col))
+            else:
+                if is_enemy(piece, target):
+                    moves.append((new_row, new_col))
+                break
+
+            new_row += dr
+            new_col += dc
+
+    return moves
 
 
 def get_queen_moves(board, row, col):
-    """Return valid movement squares for a queen."""
-    return []
+    """Return all valid movement squares for a queen."""
+
+    moves = []
+    piece = board[row][col]
+
+    if piece is None:
+        return moves
+
+    directions = [
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1),
+        (-1, -1),
+        (-1, 1),
+        (1, -1),
+        (1, 1)
+    ]
+
+    for dr, dc in directions:
+        new_row = row + dr
+        new_col = col + dc
+
+        while is_inside_board(new_row, new_col):
+            target = board[new_row][new_col]
+
+            if target is None:
+                moves.append((new_row, new_col))
+            else:
+                if is_enemy(piece, target):
+                    moves.append((new_row, new_col))
+                break
+
+            new_row += dr
+            new_col += dc
+
+    return moves
 
 
 def get_king_moves(board, row, col):
-    """Return valid movement squares for a king."""
-    return []
+    """Return all valid movement squares for a king."""
+
+    moves = []
+    piece = board[row][col]
+
+    if piece is None:
+        return moves
+
+    directions = [
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1)
+    ]
+
+    for dr, dc in directions:
+        new_row = row + dr
+        new_col = col + dc
+
+        if is_inside_board(new_row, new_col):
+            target = board[new_row][new_col]
+
+            if target is None:
+                moves.append((new_row, new_col))
+            elif is_enemy(piece, target):
+                moves.append((new_row, new_col))
+
+    return moves
 
 
 def get_valid_moves(board, row, col):
-    """Return all valid movement squares for the selected piece."""
+    """Return movement squares for the selected chess piece."""
+
+    if not is_inside_board(row, col):
+        return []
 
     piece = board[row][col]
+
+    if piece is None:
+        return []
 
     if piece == "WP" or piece == "BP":
         return get_pawn_moves(board, row, col)

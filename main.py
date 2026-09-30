@@ -39,3 +39,26 @@ while running:
     pygame.display.update()
 
 pygame.quit()
+from gui import ChessGUI
+
+
+def main():
+
+    # Temporary board for GUI testing
+    board = [
+        ["BR", "BN", "BB", "BQ", "BK", "BB", "BN", "BR"],
+        ["BP", "BP", "BP", "BP", "BP", "BP", "BP", "BP"],
+        ["--", "--", "--", "--", "--", "--", "--", "--"],
+        ["--", "--", "--", "--", "--", "--", "--", "--"],
+        ["--", "--", "--", "--", "--", "--", "--", "--"],
+        ["--", "--", "--", "--", "--", "--", "--", "--"],
+        ["WP", "WP", "WP", "WP", "WP", "WP", "WP", "WP"],
+        ["WR", "WN", "WB", "WQ", "WK", "WB", "WN", "WR"]
+    ]
+
+    gui = ChessGUI()
+    gui.run(board)
+
+
+if __name__ == "__main__":
+    main()

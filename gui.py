@@ -1,5 +1,5 @@
 import pygame
-import os
+from piece_renderer import PieceRenderer
 
 
 class ChessGUI:
@@ -8,13 +8,9 @@ class ChessGUI:
 
         pygame.init()
 
-        # -----------------------------------------
         # Window
-        # -----------------------------------------
-
         self.BOARD_SIZE = board_size
         self.SQUARE_SIZE = board_size // 8
-
         self.SIDEBAR_WIDTH = 220
 
         self.WINDOW_WIDTH = (
@@ -36,137 +32,62 @@ class ChessGUI:
 
         self.clock = pygame.time.Clock()
 
-        # -----------------------------------------
         # Board colors
-        # -----------------------------------------
-
         self.LIGHT_SQUARE = (240, 217, 181)
         self.DARK_SQUARE = (181, 136, 99)
 
-        # -----------------------------------------
         # Highlight colors
-        # -----------------------------------------
-
         self.SELECTED_COLOR = (255, 215, 0)
         self.MOVE_COLOR = (80, 180, 80)
-        self.CAPTURE_COLOR = (200, 70, 70)
         self.LAST_MOVE_COLOR = (100, 150, 220)
 
-        # -----------------------------------------
         # GUI colors
-        # -----------------------------------------
-
         self.BACKGROUND_COLOR = (35, 35, 35)
         self.TEXT_COLOR = (255, 255, 255)
 
-        # -----------------------------------------
         # State
-        # -----------------------------------------
-
         self.selected_square = None
-
         self.possible_moves = []
-
         self.captured_pieces = []
-
         self.last_move = None
 
-        # -----------------------------------------
-        # Load pieces
-        # -----------------------------------------
+        # Piece renderer
+        self.piece_renderer = PieceRenderer(
+            self.SQUARE_SIZE
+        )
 
-        self.pieces = {}
-
-        self.load_piece_images()
-
-    # =====================================================
-    # LOAD PIECE IMAGES
-    # =====================================================
-
-    def load_piece_images(self):
-
-        piece_names = [
-            "WP", "WR", "WN", "WB", "WQ", "WK",
-            "BP", "BR", "BN", "BB", "BQ", "BK"
-        ]
-
-        for piece in piece_names:
-
-            path = os.path.join(
-                "assets",
-                "pieces",
-                piece + ".png"
-            )
-
-            try:
-
-                image = pygame.image.load(path)
-
-                image = pygame.transform.smoothscale(
-                    image,
-                    (
-                        self.SQUARE_SIZE,
-                        self.SQUARE_SIZE
-                    )
-                )
-
-                self.pieces[piece] = image
-
-            except pygame.error:
-
-                print(
-                    f"Warning: Could not load {path}"
-                )
-
-    # =====================================================
-    # DRAW BOARD
-    # =====================================================
+    # -----------------------------
+    # BOARD
+    # -----------------------------
 
     def draw_board(self):
 
         for row in range(8):
-
             for col in range(8):
 
-                if (row + col) % 2 == 0:
-
-                    color = self.LIGHT_SQUARE
-
-                else:
-
-                    color = self.DARK_SQUARE
-
-                x = col * self.SQUARE_SIZE
-                y = row * self.SQUARE_SIZE
+                color = (
+                    self.LIGHT_SQUARE
+                    if (row + col) % 2 == 0
+                    else self.DARK_SQUARE
+                )
 
                 pygame.draw.rect(
                     self.screen,
                     color,
                     (
-                        x,
-                        y,
+                        col * self.SQUARE_SIZE,
+                        row * self.SQUARE_SIZE,
                         self.SQUARE_SIZE,
                         self.SQUARE_SIZE
                     )
                 )
 
-    # =====================================================
-    # DRAW BOARD COORDINATES
-    # =====================================================
-
     def draw_coordinates(self):
 
         font = pygame.font.Font(None, 18)
 
-        files = [
-            "a", "b", "c", "d",
-            "e", "f", "g", "h"
-        ]
-
-        ranks = [
-            "8", "7", "6", "5",
-            "4", "3", "2", "1"
-        ]
+        files = "abcdefgh"
+        ranks = "87654321"
 
         for col in range(8):
 
@@ -176,8 +97,6 @@ class ChessGUI:
                 - 12
             )
 
-            y = self.BOARD_SIZE - 18
-
             text = font.render(
                 files[col],
                 True,
@@ -186,17 +105,10 @@ class ChessGUI:
 
             self.screen.blit(
                 text,
-                (x, y)
+                (x, self.BOARD_SIZE - 18)
             )
 
         for row in range(8):
-
-            x = 5
-
-            y = (
-                row * self.SQUARE_SIZE
-                + 5
-            )
 
             text = font.render(
                 ranks[row],
@@ -206,27 +118,19 @@ class ChessGUI:
 
             self.screen.blit(
                 text,
-                (x, y)
+                (5, row * self.SQUARE_SIZE + 5)
             )
 
-    # =====================================================
-    # DRAW LAST MOVE
-    # =====================================================
+    # -----------------------------
+    # HIGHLIGHTS
+    # -----------------------------
 
     def draw_last_move(self):
 
         if self.last_move is None:
             return
 
-        start_square, end_square = self.last_move
-
-        for row, col in [
-            start_square,
-            end_square
-        ]:
-
-            x = col * self.SQUARE_SIZE
-            y = row * self.SQUARE_SIZE
+        for row, col in self.last_move:
 
             surface = pygame.Surface(
                 (
@@ -237,22 +141,16 @@ class ChessGUI:
             )
 
             surface.fill(
-                (
-                    self.LAST_MOVE_COLOR[0],
-                    self.LAST_MOVE_COLOR[1],
-                    self.LAST_MOVE_COLOR[2],
-                    80
-                )
+                (*self.LAST_MOVE_COLOR, 80)
             )
 
             self.screen.blit(
                 surface,
-                (x, y)
+                (
+                    col * self.SQUARE_SIZE,
+                    row * self.SQUARE_SIZE
+                )
             )
-
-    # =====================================================
-    # DRAW SELECTED SQUARE
-    # =====================================================
 
     def draw_selected_square(self):
 
@@ -261,37 +159,25 @@ class ChessGUI:
 
         row, col = self.selected_square
 
-        x = col * self.SQUARE_SIZE
-        y = row * self.SQUARE_SIZE
-
         pygame.draw.rect(
             self.screen,
             self.SELECTED_COLOR,
             (
-                x,
-                y,
+                col * self.SQUARE_SIZE,
+                row * self.SQUARE_SIZE,
                 self.SQUARE_SIZE,
                 self.SQUARE_SIZE
             ),
             5
         )
 
-    # =====================================================
-    # DRAW POSSIBLE MOVES
-    # =====================================================
-
     def draw_possible_moves(self):
 
-        for move in self.possible_moves:
+        for row, col in self.possible_moves:
 
-            row, col = move
-
-            center_x = (
+            center = (
                 col * self.SQUARE_SIZE
-                + self.SQUARE_SIZE // 2
-            )
-
-            center_y = (
+                + self.SQUARE_SIZE // 2,
                 row * self.SQUARE_SIZE
                 + self.SQUARE_SIZE // 2
             )
@@ -299,104 +185,13 @@ class ChessGUI:
             pygame.draw.circle(
                 self.screen,
                 self.MOVE_COLOR,
-                (
-                    center_x,
-                    center_y
-                ),
+                center,
                 10
             )
 
-    # =====================================================
-    # DRAW PIECES
-    # =====================================================
-
-    def draw_pieces(self, board):
-
-        for row in range(8):
-
-            for col in range(8):
-
-                piece = board[row][col]
-
-                # Empty square
-                if piece == "--":
-                    continue
-
-                # No piece
-                if piece is None:
-                    continue
-
-                image = self.pieces.get(piece)
-
-                if image is None:
-                    continue
-
-                x = col * self.SQUARE_SIZE
-                y = row * self.SQUARE_SIZE
-
-                self.screen.blit(
-                    image,
-                    (
-                        x,
-                        y
-                    )
-                )
-
-    # =====================================================
-    # DRAW CAPTURED PIECES
-    # =====================================================
-
-    def draw_captured_pieces(self):
-
-        font = pygame.font.Font(
-            None,
-            25
-        )
-
-        title = font.render(
-            "Captured Pieces",
-            True,
-            self.TEXT_COLOR
-        )
-
-        self.screen.blit(
-            title,
-            (
-                self.BOARD_SIZE + 20,
-                25
-            )
-        )
-
-        x = self.BOARD_SIZE + 20
-        y = 65
-
-        for piece in self.captured_pieces:
-
-            image = self.pieces.get(piece)
-
-            if image is None:
-                continue
-
-            small_image = pygame.transform.smoothscale(
-                image,
-                (40, 40)
-            )
-
-            self.screen.blit(
-                small_image,
-                (x, y)
-            )
-
-            x += 45
-
-            if x > self.WINDOW_WIDTH - 45:
-
-                x = self.BOARD_SIZE + 20
-                y += 45
-
-    # =====================================================
-    # DRAW SIDE PANEL
-    # =====================================================
+    # -----------------------------
+    # SIDEBAR
+    # -----------------------------
 
     def draw_sidebar(self):
 
@@ -411,10 +206,7 @@ class ChessGUI:
             )
         )
 
-        font = pygame.font.Font(
-            None,
-            30
-        )
+        font = pygame.font.Font(None, 30)
 
         title = font.render(
             "CHESS",
@@ -430,25 +222,41 @@ class ChessGUI:
             )
         )
 
-    # =====================================================
-    # CONVERT MOUSE → BOARD SQUARE
-    # =====================================================
+        font = pygame.font.Font(None, 25)
+
+        title = font.render(
+            "Captured Pieces",
+            True,
+            self.TEXT_COLOR
+        )
+
+        self.screen.blit(
+            title,
+            (
+                self.BOARD_SIZE + 20,
+                25
+            )
+        )
+
+        self.piece_renderer.draw_captured_pieces(
+            self.screen,
+            self.captured_pieces,
+            self.BOARD_SIZE,
+            self.WINDOW_WIDTH
+        )
+
+    # -----------------------------
+    # MOUSE / SELECTION
+    # -----------------------------
 
     def get_board_square(self, mouse_position):
 
         mouse_x, mouse_y = mouse_position
 
-        # Click outside board
-        if mouse_x < 0:
-            return None
-
-        if mouse_x >= self.BOARD_SIZE:
-            return None
-
-        if mouse_y < 0:
-            return None
-
-        if mouse_y >= self.BOARD_SIZE:
+        if not (
+            0 <= mouse_x < self.BOARD_SIZE
+            and 0 <= mouse_y < self.BOARD_SIZE
+        ):
             return None
 
         col = mouse_x // self.SQUARE_SIZE
@@ -456,92 +264,43 @@ class ChessGUI:
 
         return row, col
 
-    # =====================================================
-    # SELECT PIECE
-    # =====================================================
-
     def select_piece(self, square, board):
 
         if square is None:
             return False
 
         row, col = square
-
         piece = board[row][col]
 
-        # Empty square
         if piece == "--" or piece is None:
-
-            self.selected_square = None
-            self.possible_moves = []
-
+            self.clear_selection()
             return False
 
-        # Select piece
         self.selected_square = square
 
         return True
 
-    # =====================================================
-    # SET POSSIBLE MOVES
-    # =====================================================
-
     def set_possible_moves(self, moves):
-
-        """
-        Called by Member 3's Movement Engine.
-
-        Example:
-
-        [
-            (5, 4),
-            (4, 4)
-        ]
-        """
-
         self.possible_moves = moves
 
-    # =====================================================
-    # CLEAR SELECTION
-    # =====================================================
-
     def clear_selection(self):
-
         self.selected_square = None
         self.possible_moves = []
 
-    # =====================================================
-    # SET LAST MOVE
-    # =====================================================
-
-    def set_last_move(
-        self,
-        start_square,
-        end_square
-    ):
-
+    def set_last_move(self, start_square, end_square):
         self.last_move = (
             start_square,
             end_square
         )
 
-    # =====================================================
-    # ADD CAPTURED PIECE
-    # =====================================================
-
     def add_captured_piece(self, piece):
 
-        if piece is None:
-            return
+        if piece is not None and piece != "--":
+            self.captured_pieces.append(piece)
 
-        if piece == "--":
-            return
-
-        self.captured_pieces.append(piece)
-
-    # =====================================================
-    # DRAW EVERYTHING
-    # =====================================================
+    # -----------------------------
+    # DRAW
+    # -----------------------------
 
     def draw(self, board):
 
@@ -549,80 +308,62 @@ class ChessGUI:
             self.BACKGROUND_COLOR
         )
 
-        # Board
         self.draw_board()
-
-        # Last move
         self.draw_last_move()
-
-        # Possible moves
         self.draw_possible_moves()
-
-        # Selected square
         self.draw_selected_square()
 
-        # Pieces
-        self.draw_pieces(board)
+        self.piece_renderer.draw_pieces(
+            self.screen,
+            board
+        )
 
-        # Coordinates
         self.draw_coordinates()
-
-        # Sidebar
         self.draw_sidebar()
-
-        # Captured pieces
-        self.draw_captured_pieces()
 
         pygame.display.flip()
 
-    # =====================================================
-    # HANDLE MOUSE EVENTS
-    # =====================================================
+    # -----------------------------
+    # EVENTS
+    # -----------------------------
 
     def handle_events(self, board):
 
         for event in pygame.event.get():
 
-            # Close window
             if event.type == pygame.QUIT:
-
                 return False
 
-            # Mouse click
             if event.type == pygame.MOUSEBUTTONDOWN:
 
-                if event.button == 1:
+                if event.button != 1:
+                    continue
 
-                    square = self.get_board_square(
-                        event.pos
+                square = self.get_board_square(
+                    event.pos
+                )
+
+                if square is None:
+                    continue
+
+                selected = self.select_piece(
+                    square,
+                    board
+                )
+
+                if selected:
+                    print(
+                        "Selected:",
+                        board[square[0]][square[1]],
+                        "Square:",
+                        square
                     )
-
-                    if square is None:
-                        continue
-
-                    selected = self.select_piece(
-                        square,
-                        board
-                    )
-
-                    if selected:
-
-                        print(
-                            "Selected:",
-                            board[
-                                square[0]
-                            ][
-                                square[1]
-                            ],
-                            "Square:",
-                            square
-                        )
 
         return True
 
-    # =====================================================
-    # RUN GUI
-    # =====================================================
+    # -----------------------------
+    # RUN
+    # -----------------------------
 
     def run(self, board):
 
@@ -630,9 +371,7 @@ class ChessGUI:
 
         while running:
 
-            running = self.handle_events(
-                board
-            )
+            running = self.handle_events(board)
 
             self.draw(board)
 

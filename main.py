@@ -1,43 +1,56 @@
 import pygame
 # import board
 
-pygame.init() # initializes Pygame's modules.
+# Initialize Pygame
+pygame.init()
 
-# TODO: store width, height values in a constant. 
-screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE) # will create a display surface.
+# Create resizable window
+screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
-pygame.display.set_caption("Chess") # title for the window.
-icon = pygame.image.load("assets/logo.jpg") # loads the 'image/icon'.
-# TODO: look up if this method can be replaced.
-pygame.display.set_icon(icon) # sets the 'image/icon'.
+# Set window title
+pygame.display.set_caption("Chess")
 
+# Control the game loop
 running = True
 
 while running: # game loop; for rendering graphics, repeatedly handle events and update game logic.
 
-    board.draw_board(screen) # draws the 'board'.
-    board.draw_coordinates(screen) # draws the coordinates on the board.
+    # Draw the chess board
+    board.draw_board(screen)
 
-    for event in pygame.event.get(): # iterates through the list of 'events' that occur.
+    # Draw chess coordinates
+    board.draw_coordinates(screen)
 
-        if event.type == pygame.QUIT: # pretty straightforward.
+    # Get and handle events
+    for event in pygame.event.get():
+
+        # Close the window
+        if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN: # triggered when pressed a keyboard key.
-            if event.key == pygame.K_ESCAPE: # 'esc' button.
+        # Handle keyboard input
+        if event.type == pygame.KEYDOWN:
+
+            # Close the game when ESC is pressed
+            if event.key == pygame.K_ESCAPE:
                 running = False
 
-        if event.type == pygame.MOUSEBUTTONDOWN: # pretty straighforward; mouse click.
+        # Handle mouse clicks
+        if event.type == pygame.MOUSEBUTTONDOWN:
 
-            square = board.get_square( # gets the pos of the square that is being clicked.
+            # Get the clicked chess square
+            square = board.get_square(
                 screen,
                 event.pos[0],
                 event.pos[1]
             )
 
-            if square: # if the click happens inside a particular cell/square it's displayed.
+            # Print the square if it is valid
+            if square:
                 print(square)
 
-    pygame.display.update() # refresh/update the page so that changes are visible.
+    # Update the display
+    pygame.display.update()
 
-pygame.quit() # shutting down; releasing resources per se.
+# Close Pygame
+pygame.quit()
